@@ -14,7 +14,7 @@ from dhutil.batch import batch_augmentation
 '''
 params:
 * dataset_dir (required) -> base directory of the dataset (images should be in "db" subdirectories)
-* tile_size (int)
+* tile_size (int) (required)
 * removeBackground (bool) -> remove non-tissue pixels from the slide
 * justOne (bool) -> load only one slide for quick testing
 * verbose (bool)
@@ -29,7 +29,7 @@ class ArtefactDataFeed:
     def __init__(self, params, db, generator=None):
         # General parameters
         self.directory = params['dataset_dir']
-        self.tile_size = params['tile_size'] if 'tile_size' in params else 256
+        self.tile_size = params['tile_size']
         self.db = db
         self.removeBackground = params['removeBackground'] if 'removeBackground' in params else True
         self.justOne = params['justOne'] if 'justOne' in params else False

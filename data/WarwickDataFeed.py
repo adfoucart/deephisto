@@ -21,7 +21,7 @@ class WarwickDataFeed:
     def __init__(self, params, db, generator=None):
         # General parameters
         self.directory = params['dataset_dir']
-        self.tile_size = params['tile_size'] if 'tile_size' in params else 256
+        self.tile_size = params['tile_size']
         self.db = db
         self.v = params['verbose'] if 'verbose' in params else False
 

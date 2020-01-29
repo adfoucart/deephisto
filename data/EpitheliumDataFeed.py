@@ -19,7 +19,7 @@ from dhutil.batch import batch_augmentation
 '''
 params:
 * dataset_dir -> base directory of the dataset (images should be in "db" subdirectories)
-* tile_size (int)
+* tile_size (int) (required)
 * verbose (bool)
 * annotations (string) -> which (possibly corrupted) version of the annotations (for SNOW testing)
 * noisy (bool) -> Use "Noisy" annotations
@@ -34,7 +34,7 @@ class EpitheliumDataFeed:
     def __init__(self, params, db, generator=None):
         # General parameters
         self.directory = params['dataset_dir']
-        self.tile_size = params['tile_size'] if 'tile_size' in params else 256
+        self.tile_size = params['tile_size']
         self.db = db
         self.Xdir = os.path.join(self.directory, db)
         self.v = params['verbose'] if 'verbose' in params else False
