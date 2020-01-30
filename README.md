@@ -51,4 +51,4 @@ J. Pathol. Inform., vol. 7, no. 29, 2016.
 
 ### Artefact
 
-To be released.
+To be released. If you are interested in using this dataset, please contact me: afoucart@ulb.ac.be
