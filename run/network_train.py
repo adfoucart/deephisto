@@ -1,7 +1,24 @@
+# -*- coding: utf-8 -*-
+'''
+Author: Adrien Foucart
+'''
 from data import ArtefactDataFeed, EpitheliumDataFeed, WarwickDataFeed
 from network import PAN, ShortRes
 from dhutil.network import train
 
+'''
+Train a network on a data feed.
+
+params -> dictionnary.
+Required fields:
+* network
+* feed_name
+* dataset_dir
+* tile_size
+* clf_name
+* checkpoints_dir
+* summaries_dir
+'''
 def run_train(params):
     net = None
     feed = None

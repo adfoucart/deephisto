@@ -27,6 +27,7 @@ https://doi.org/doi:10.3389/fmed.2019.00222
 
 * Python 3.5
 * TensorFlow (1.4)
+* Openslide (for running the whole-slide artefact detector)
 * Scikit-Image
 * Numpy
 
