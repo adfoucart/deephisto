@@ -14,60 +14,10 @@ import tensorflow as tf
 import os
 import numpy as np
 from skimage.io import imsave
-import sys
-import openslide
-from skimage.morphology import opening, closing, disk
-from skimage.color import rgb2gray, rgb2hsv
-from skimage.transform import downscale_local_mean, resize
+from dhutil.artefact import getBackgroundMask, blend2Images, get_image
 from dhutil.tools import printProgressBar
 from dhutil.network import restore
-
-'''
-Load a whole-slide image (ndpi, svs) & extract image @ 1.25x magnification
-'''
-def get_image(fpath, verbose=False):
-    if( verbose ): print("Loading RGB image @ 1.25x magnification")
-    slide = openslide.OpenSlide(fpath)
-    op = float(slide.properties['openslide.objective-power']) # maximum magnification
-    down_factor = op/1.25
-    level = slide.get_best_level_for_downsample(down_factor)
-    relative_down = down_factor / slide.level_downsamples[level]
-
-    rgb_image = slide.read_region((0,0), level, slide.level_dimensions[level])
-    newsize = np.array((slide.level_dimensions[level][0]/relative_down, slide.level_dimensions[level][1]/relative_down)).astype('int')
-    rgb_image = np.array(rgb_image.resize(newsize))[:,:,:3].astype('uint8')
-    return rgb_image
-
-'''
-blend2Images mathod From HistoQC (Janowczyk et al, 2019)
-https://github.com/choosehappy/HistoQC
-
-Produces output image with artefact regions in green.
-'''
-def blend2Images(img, mask):
-    if (img.ndim == 3):
-        img = rgb2gray(img)
-    if (mask.ndim == 3):
-        mask = rgb2gray(mask)
-    img = img[:, :, None] * 1.0  # can't use boolean
-    mask = mask[:, :, None] * 1.0
-    out = np.concatenate((mask, img, mask), 2)
-    return out
-
-'''
-Get a mask with the low-saturation regions, which are regions with no tissue.
-'''
-def getBackground(rgb):
-    # Work at lower resolution
-    scale_factor = 8
-    lr = downscale_local_mean(rgb, (scale_factor,scale_factor,1))
-    hsv = rgb2hsv(lr)
-
-    bg = hsv[:,:,1]<0.04
-    bg = resize(bg, (rgb.shape[0],rgb.shape[1]))<0.5
-    bg = opening(closing(bg, disk(5)), disk(10)).astype('bool')
-
-    return bg
+import time
 
 '''
 Process an 1.25x mag RGB image.
@@ -83,7 +33,7 @@ def process(sess, rgb, X, Y_seg, tile_size, verbose=False):
 
     # Background detection
     if(verbose): print("Background detection.")
-    bg_mask = getBackground(rgb)
+    bg_mask = getBackgroundMask(rgb) # 1 = foreground, 0 = background
     
     overlap = 2
     
@@ -106,8 +56,8 @@ def process(sess, rgb, X, Y_seg, tile_size, verbose=False):
         im_pred[t[0]:t[0]+tile_size, t[1]:t[1]+tile_size] = np.maximum(im_pred[t[0]:t[0]+tile_size, t[1]:t[1]+tile_size], sm[0,:,:])
         if(verbose): printProgressBar(idt+1, len(mesh[0].flatten()))
 
-    mask_pred = im_pred<=0.5
-    mask_out = mask_pred*bg_mask
+    mask_pred = im_pred<=0.5 # mask_pred will be 0=artefact, 1=no artefact
+    mask_out = mask_pred*bg_mask # 1=normal tissue, 0 = background or artefact
     im_out = blend2Images(rgb, mask_out)
 
     return im_pred,im_out, bg_mask
@@ -118,11 +68,12 @@ Detect artefact on WSI
 * input_dir -> directory with WSI
 * output_dir -> directory to store result images
 * network_path -> checkpoint path of the network
+* asThread -> threaded version where the method polls the input folder regularly for new files to digest
 * ext (optional) -> extension filter 
 
 Results are stored in output_dir.
 '''
-def artefact_detector(input_dir, output_dir, network_path, ext=None, verbose=False):
+def artefact_detector(input_dir, output_dir, network_path, asThread=False, ext=None, verbose=False):
     if( ext == None ):
         ext = ['svs', 'ndpi']
     
@@ -135,23 +86,54 @@ def artefact_detector(input_dir, output_dir, network_path, ext=None, verbose=Fal
         X = tf.get_default_graph().get_tensor_by_name("ae/features/X:0")
 
     # Get tile size from placeholder
-    tile_size = X.get_shape()[1]
+    tile_size = X.get_shape().as_list()[1]
 
     # Load output tensor
     Y_seg = tf.get_default_graph().get_tensor_by_name("output/segmentation:0")
     
-    # Load input files list
-    input_files = [os.path.join(input_dir,f) for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir,f)) and f.split('.')[-1] in ext]
-    
-    # Process files
-    for input_image in input_files:
-        if(verbose): print(input_image)
-        # Get RGB
-        rgb = get_image(input_image)
-        # Process
-        im_pred, im_out, bg_mask = process(sess, rgb, X, Y_seg, params)
-        # Save results
-        imsave(os.path.join(output_dir, "%s_rgb.png"%os.path.basename(input_image)), rgb)
-        imsave(os.path.join(output_dir, "%s_prob.png"%os.path.basename(input_image)), im_pred)
-        imsave(os.path.join(output_dir, "%s_fused.png"%os.path.basename(input_image)), im_out)
-        imsave(os.path.join(output_dir, "%s_bg.png"%os.path.basename(input_image)), bg_mask)
+    attemptsRemaining = {}
+
+    while True:
+        # Load input files list
+        input_files = [os.path.join(input_dir,f) for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir,f)) and f.split('.')[-1] in ext]
+        if( asThread ): 
+            time.sleep(5)
+
+        # Process files
+        for input_image in input_files:
+            if(verbose): print(input_image)
+            # Get RGB
+            try:
+                rgb = get_image(input_image)
+            except Exception as e:
+                if( input_image in attemptsRemaining ):
+                    attemptsRemaining[input_image] -= 1
+                else:
+                    attemptsRemaining[input_image] = 10
+
+                if( attemptsRemaining[input_image] > 0 ):
+                    print('Error trying to process %s... %d attempts remaining.'%(input_image, attemptsRemaining[input_image]))
+                    continue
+                else:
+                    print('Too many errors. Passing file %s'%input_image)
+                    continue
+
+            # Process
+            im_pred, im_out, bg_mask = process(sess, rgb, X, Y_seg, tile_size, verbose)
+
+            # Compute & save quick stat
+            total_artefact_tissue = ((im_pred>0.5)*bg_mask).sum()
+            total_tissue = (bg_mask).sum()
+            with open(os.path.join(output_dir, "%s_stat.txt"%os.path.basename(input_image)), 'w') as fp:
+                fp.write("Artefact in non-background tissue: %.4f %% of pixels."%(100*(total_artefact_tissue/total_tissue)))
+
+            # Save results
+            imsave(os.path.join(output_dir, "%s_rgb.png"%os.path.basename(input_image)), rgb)
+            imsave(os.path.join(output_dir, "%s_prob.png"%os.path.basename(input_image)), im_pred)
+            imsave(os.path.join(output_dir, "%s_fused.png"%os.path.basename(input_image)), im_out)
+            imsave(os.path.join(output_dir, "%s_bg.png"%os.path.basename(input_image)), bg_mask.astype('uint8')*255)
+
+            # Rename file to make sure we don't redo it after
+            os.rename(input_image, '%s.done'%input_image)
+
+        if( not asThread ): break
