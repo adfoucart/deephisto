@@ -31,11 +31,11 @@ def run_train(params):
     net.create_network()
 
     if params['feed_name'] == 'artefact':
-        feed = ArtefactDataFeed(params, db, net.predict_generator)
+        feed = ArtefactDataFeed(params, 'train', net.predict_generator)
     elif params['feed_name'] == 'epi':
-        feed = EpitheliumDataFeed(params, db, net.predict_generator)
+        feed = EpitheliumDataFeed(params, 'train', net.predict_generator)
     elif params['feed_name'] == 'warwick':
-        feed = WarwickDataFeed(params, db, net.predict_generator)
+        feed = WarwickDataFeed(params, 'train', net.predict_generator)
 
     batch_size = params['batch_size'] if 'batch_size' in params else 20
     nPatchesInValSet = params['nPatchesInValSet'] if 'nPatchesInValSet' in params else 40
