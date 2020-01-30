@@ -10,7 +10,7 @@ Built for TensorFlow 1.4
 
 import tensorflow as tf
 import numpy as np
-import BaseNetwork
+from .BaseNetwork import BaseNetwork
 # from dhutil.network import initialize_uninitialized
 
 class ShortRes(BaseNetwork):
