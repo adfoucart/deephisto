@@ -13,14 +13,14 @@ Produces a 1.25x mag output w/ 3 images:
 import tensorflow as tf
 import os
 import numpy as np
-from matplotlib import pyplot as plt
-from skimage.io import imread, imsave
+from skimage.io import imsave
 import sys
 import openslide
 from skimage.morphology import opening, closing, disk
 from skimage.color import rgb2gray, rgb2hsv
 from skimage.transform import downscale_local_mean, resize
 from dhutil.tools import printProgressBar
+from dhutil.network import restore
 
 '''
 Load a whole-slide image (ndpi, svs) & extract image @ 1.25x magnification
@@ -72,12 +72,13 @@ def getBackground(rgb):
 '''
 Process an 1.25x mag RGB image.
 
+* sess -> tensorflow session
 * rgb -> the image
 * X -> the input placeholder Tensor
 * Y_seg -> the segmentation output Tensor
 * tile_size
 '''
-def process(rgb, X, Y_seg, tile_size, verbose=False):
+def process(sess, rgb, X, Y_seg, tile_size, verbose=False):
     if(verbose): print("Processing RGB image")
 
     # Background detection
@@ -125,10 +126,7 @@ def artefact_detector(input_dir, output_dir, network_path, ext=None, verbose=Fal
     if( ext == None ):
         ext = ['svs', 'ndpi']
     
-    tf.reset_default_graph()
-    sess = tf.Session()
-    saver = tf.train.import_meta_graph('%s.meta'%network_path)
-    saver.restore(sess, network_path)
+    sess,saver = restore(network_path)
 
     # Load input placeholders
     try:
@@ -151,7 +149,7 @@ def artefact_detector(input_dir, output_dir, network_path, ext=None, verbose=Fal
         # Get RGB
         rgb = get_image(input_image)
         # Process
-        im_pred, im_out, bg_mask = process(rgb, X, Y_seg, params)
+        im_pred, im_out, bg_mask = process(sess, rgb, X, Y_seg, params)
         # Save results
         imsave(os.path.join(output_dir, "%s_rgb.png"%os.path.basename(input_image)), rgb)
         imsave(os.path.join(output_dir, "%s_prob.png"%os.path.basename(input_image)), im_pred)

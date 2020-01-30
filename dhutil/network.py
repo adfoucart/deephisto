@@ -66,3 +66,14 @@ def train(net, feed, nPatchesInValSet=40, batch_size=20, epochs=1500):
     # Save at the end
     with net.mainGraph.as_default():
         saver.save(net.sess, "%s/%s.ckpt"%(net.checkpoints_dir,net.clf_name))
+
+'''
+Restore a network & session from meta graph & checkpoint 
+'''
+def restore(network_path):
+    tf.reset_default_graph()
+    sess = tf.Session()
+    saver = tf.train.import_meta_graph('%s.meta'%network_path)
+    saver.restore(sess, network_path)
+
+    return sess, saver
