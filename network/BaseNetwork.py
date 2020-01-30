@@ -56,6 +56,10 @@ class BaseNetwork:
         self.generative = params['generative'] if 'generative' in params else False
         self.generator = params['generator'] if 'generator' in params else None
 
+    '''
+    Setup the graphs & sessions
+    '''
+    def setup(self):
         # Setup main graph & session
         tf.reset_default_graph()
         self.mainGraph = tf.Graph()

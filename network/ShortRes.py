@@ -47,6 +47,8 @@ class ShortRes(BaseNetwork):
      --- r1 -- r2 -- r3 -- up1 -- r4 -- up2 -- r5 -- out
     '''
     def create_network(self):
+        self.setup()
+        
         with self.mainGraph.as_default():
             if( self.feature_tensor != None ):
                 net = self.mainGraph.get_tensor_by_name("ae/features/%s:0"%self.feature_tensor)

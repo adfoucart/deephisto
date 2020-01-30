@@ -63,6 +63,8 @@ class PAN(BaseNetwork):
        |--------------------------------------|
     '''
     def create_network(self):
+        self.setup()
+        
         with self.mainGraph.as_default():
             # Get pre-trained tensors from autoencoder
             if( self.autoencoder != None ):
