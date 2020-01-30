@@ -9,6 +9,16 @@ Dataset downloaded from : http://www.andrewjanowczyk.com/deep-learning/
 Citation:
 A. Janowczyk and A. Madabhushi, “Deep learning for digital pathology image analysis: A comprehensive tutorial with selected use cases,” 
 J. Pathol. Inform., vol. 7, no. 29, 2016.
+
+The dataset should be structured as follows:
+
+- <DATASET_DIR>
+|---- <db> (train, test, validation...)
+        |---- *.tif (RGB images)
+|---- labels-<annotations> (full, n50, bb, ...)
+        |---- *.png (Annotation mask or labels corresponding to the .tif images)
+        |---- *-p5.png (Annotations mask or labels after dilation by disk(5) for Label Augmentation)
+        |---- *-m5.png (Annotations mask or labels after erosion by disk(5) for Label Augmentation)
 '''
 
 import numpy as np

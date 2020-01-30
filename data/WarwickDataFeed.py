@@ -9,6 +9,14 @@ Dataset downloaded from https://warwick.ac.uk/fac/sci/dcs/research/tia/glasconte
 Citation:
 K. Sirinukunwattana, J. P. W. Pluim, H. Chen, et al,  “Gland segmentation in colon histology images: The glas challenge contest,” 
 Med. Image Anal., vol. 35, pp. 489–502, 2017.
+
+The dataset should be structured as follows:
+
+- <DATASET_DIR>
+|---- <db>_<id>.bmp (RGB images, db in {'train', 'testA', 'testB'}, id = integer)
+|---- <db>_<id>_<anno>.bmp (Annotation masks or labels, anno in {'anno', 'bb', ...)
+|---- <db>_<id>_<anno>+5.bmp (Annotation masks or labels with dilation by disk(5) for Label Augmentation)
+|---- <db>_<id>_<anno>-5.bmp (Annotation masks or labels with erosion by disk(5) for Label Augmentation)
 '''
 
 import numpy as np

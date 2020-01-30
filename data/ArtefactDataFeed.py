@@ -3,6 +3,16 @@
 Author: Adrien Foucart
 
 Load dataset, perform pre-processing and data augmentation, produce mini-batch for the Artefact dataset.
+
+The dataset should be structured as follows:
+
+- <DATASET_DIR>
+|---- <db> (train, test, validation...)
+        |---- *_rgb.png (RGB images)
+        |---- *_bg.png (optional, may be generated, Background masks)
+        |---- *_mask.png (Annotation masks or labels)
+|---- <db>
+        |---- ...
 '''
 
 import numpy as np
