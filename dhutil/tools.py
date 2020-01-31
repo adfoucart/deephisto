@@ -22,3 +22,28 @@ def printProgressBar(iteration, total, prefix = '', suffix = '', decimals = 1, l
     # Print New Line on Complete
     if iteration == total: 
         print()
+
+'''
+Fuse an annotation mask with an image
+
+Either using the "artefact" blend from Janowczyk or using the "red overlay"
+'''
+def saveAnnotationImage(rgb, mask, output_file, mode='red'):
+    import numpy as np
+    if( mode == 'red' ):
+        im_out = rgb.copy()
+        overlay = np.zeros((im_out.shape[0],im_out.shape[1],4)).astype('float')
+        overlay[mask,0] = 1.
+        overlay[mask,3] = 0.5
+
+        from matplotlib import pyplot as plt
+        plt.figure()
+        plt.imshow(im_out)
+        plt.imshow(overlay)
+        plt.axis('off')
+        plt.savefig(output_file)
+    elif( mode == 'artefact' ):
+        from dhutil.artefact import blend2Images
+        from skimage.io import imsave
+        out = blend2Images(rgb, mask)
+        imsave(output_file, out)
