@@ -6,7 +6,7 @@ PAN - Perfectly Adequate Network
 A Network that uses the state-of-the-art ideas of Residual Units + U-net like shortcuts + combining outputs from different levels, and is therefore perfectly adequate 
 for most common computer vision tasks, even though it's not particularly innovative on its own.
 
-Built for TensorFlow 1.4
+Built for TensorFlow 1.14
 '''
 
 import tensorflow as tf
@@ -64,7 +64,7 @@ class PAN(BaseNetwork):
     '''
     def create_network(self):
         self.setup()
-        
+
         with self.mainGraph.as_default():
             # Get pre-trained tensors from autoencoder
             if( self.autoencoder != None ):

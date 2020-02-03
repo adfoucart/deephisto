@@ -5,7 +5,7 @@ Author: Adrien Foucart
 BaseNetwork
 Superclass for the networks
 
-Built for TensorFlow 1.4
+Built for TensorFlow 1.14
 '''
 
 import tensorflow as tf
@@ -103,10 +103,10 @@ class BaseNetwork:
                 trainableVars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)
                 self.accuracy = self.loss
             else: # Train for segmentation with Cross Entropy
-                detLoss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=self.detection, labels=self.target_det, name='loss/det/softmax'), name='loss/det/reduce')
+                detLoss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=self.detection, labels=self.target_det, name='loss/det/softmax'), name='loss/det/reduce')
                 flat_logits = tf.reshape(self.segmentation, shape=(-1,self.output_classes), name='loss/seg/flat_logits')
                 flat_target = tf.reshape(self.target_seg, shape=(-1,self.output_classes), name='loss/seg/flat_target')
-                segLoss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=flat_logits, labels=flat_target, name='loss/seg/softmax'), name='loss/seg/reduce')
+                segLoss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=flat_logits, labels=flat_target, name='loss/seg/softmax'), name='loss/seg/reduce')
                 
                 # Weak & SoftWeak losses 
                 if( self.weak == 'weakish' ):

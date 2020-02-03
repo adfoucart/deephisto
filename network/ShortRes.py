@@ -5,7 +5,7 @@ Author: Adrien Foucart
 ShortRes - Short Residual network
 A simple straightforward network with residual units.
 
-Built for TensorFlow 1.4
+Built for TensorFlow 1.14
 '''
 
 import tensorflow as tf
@@ -48,7 +48,7 @@ class ShortRes(BaseNetwork):
     '''
     def create_network(self):
         self.setup()
-        
+
         with self.mainGraph.as_default():
             if( self.feature_tensor != None ):
                 net = self.mainGraph.get_tensor_by_name("ae/features/%s:0"%self.feature_tensor)
