@@ -49,14 +49,15 @@ class ArtefactDataFeed(GenericDataFeed):
         
         # Find all files from data directory and find the RGB image and the background and supervision masks.
         files = [f for f in os.listdir(self.dir)]
+        
+        self.files_X = [os.path.join(self.dir,f) for f in files if f.find('_rgb') >= 0]
+        self.files_B = [os.path.join(self.dir,f) for f in files if f.find('_bg') >= 0]
+        self.files_Y = [os.path.join(self.dir,f) for f in files if f.find('_mask') >= 0]
+
         if( self.justOne ): # Get just the first file for a quick test
-            self.files_X = [os.path.join(self.dir, '16H17792-07_HE_Lame11_1.25_rgb.png')]
-            self.files_B = [os.path.join(self.dir, '16H17792-07_HE_Lame11_1.25_bg.png')]
-            self.files_Y = [os.path.join(self.dir, '16H17792-07_HE_Lame11_1.25_mask.png')]
-        else:
-            self.files_X = [os.path.join(self.dir,f) for f in files if f.find('_rgb') >= 0]
-            self.files_B = [os.path.join(self.dir,f) for f in files if f.find('_bg') >= 0]
-            self.files_Y = [os.path.join(self.dir,f) for f in files if f.find('_mask') >= 0]
+            self.files_X = [self.files_X[0]]
+            self.files_B = [self.files_B[0]]
+            self.files_Y = [self.files_Y[0]]
 
         # NOTE : Label Augmentation not implemented
 

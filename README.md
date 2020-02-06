@@ -25,7 +25,7 @@ https://doi.org/doi:10.3389/fmed.2019.00222
 
 ## Dependencies
 
-* Python 3.5
+* Python 3.6
 * TensorFlow (built on version 1.14)
 * Openslide (for running the whole-slide artefact detector)
 * Scikit-Image
