@@ -17,6 +17,7 @@ The dataset should be structured as follows:
 
 import numpy as np
 import os
+from .GenericDataFeed import GenericDataFeed
 from skimage.io import imread
 from dhutil.artefact import getBackgroundMask 
 from dhutil.batch import batch_augmentation
@@ -34,24 +35,17 @@ params:
 * generator (method) -> predictor method of a generator DCNN
 * onlyPositives (bool) -> Use "Only positive" strategy 
 '''
-class ArtefactDataFeed:
+class ArtefactDataFeed(GenericDataFeed):
 
     def __init__(self, params, db, generator=None):
-        # General parameters
-        self.directory = params['dataset_dir']
-        self.tile_size = params['tile_size']
-        self.db = db
+        super().__init__(params,db,generator)
+
+        # Additional General parameters
         self.removeBackground = params['removeBackground'] if 'removeBackground' in params else True
         self.justOne = params['justOne'] if 'justOne' in params else False
+        
+        # Specific code
         self.dir = os.path.join(self.directory, db)
-        self.v = params['verbose'] if 'verbose' in params else False
-
-        # SNOW parameters
-        self.noisy = params['noisy'] if 'noisy' in params else False
-        self.pNoise = params['pNoise'] if 'pNoise' in params else 0.5
-        self.generative = params['generative'] if 'generative' in params else False
-        self.generator = generator
-        self.onlyPositives = params['onlyPositives'] if 'onlyPositives' in params else False
         
         # Find all files from data directory and find the RGB image and the background and supervision masks.
         files = [f for f in os.listdir(self.dir)]
@@ -64,11 +58,10 @@ class ArtefactDataFeed:
             self.files_B = [os.path.join(self.dir,f) for f in files if f.find('_bg') >= 0]
             self.files_Y = [os.path.join(self.dir,f) for f in files if f.find('_mask') >= 0]
 
+        # NOTE : Label Augmentation not implemented
+
         # Prepare random sampling
         self.idxs = np.arange(len(self.files_Y))
-        self.pointer = 0
-        self.seed = params['random_seed'] if 'random_seed' in params else 56489143
-        np.random.seed(self.seed)
 
         if( self.v ): print("Loading data from %s (%s)"%(self.directory, self.db))
 
@@ -168,35 +161,3 @@ class ArtefactDataFeed:
             return batch_X,batch_Y_seg,batch_Y_det
         else:
             return batch_augmentation(batch_X,batch_Y_seg,batch_Y_det)
-
-    '''
-    Batch generator
-    Yield samples from dataset
-    '''
-    def next_batch(self, batch_size, max_iterations, forValidation=False):
-        if( self.v ): print("Starting %d iterations"%(max_iterations))
-        # iterations = sampling each image at least once
-        for it in range(max_iterations):
-            # Shuffle ids so we don't always go through the images in the same order
-            np.random.shuffle(self.idxs)
-            # print("Iteration: %d"%it)
-
-            # For each slide : draw a random sample. Go through each image once before starting again with new seed
-            for idx in self.idxs:
-                yield self.get_sample(idx, batch_size,forValidation)
-
-    '''
-    Draw a validation set from the training set, using no data augmentation.
-    '''
-    def validation_set(self, batch_size):
-        images_used = 6
-        n_per_image = batch_size//images_used # 10 images in validation set
-        Xval = np.zeros((batch_size, self.tile_size, self.tile_size, 3))
-        Yval_seg = np.zeros((batch_size, self.tile_size, self.tile_size, 2))
-        Yval_det = np.zeros((batch_size, 2))
-        for i in range(images_used):
-            X,Y_seg,Y_det = self.get_sample(self.idxs[i], n_per_image, True)
-            Xval[int(i*n_per_image):int((i+1)*n_per_image),:,:,:] = X.copy()
-            Yval_seg[int(i*n_per_image):int((i+1)*n_per_image),:,:,:] = Y_seg.copy()
-            Yval_det[int(i*n_per_image):int((i+1)*n_per_image)] = Y_det.copy()
-        return Xval,Yval_seg,Yval_det

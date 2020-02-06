@@ -23,6 +23,7 @@ The dataset should be structured as follows:
 
 import numpy as np
 import os
+from .GenericDataFeed import GenericDataFeed
 from skimage.io import imread
 from dhutil.batch import batch_augmentation
 
@@ -39,25 +40,14 @@ params:
 * onlyPositives (bool) -> Use "Only positive" strategy 
 * tda (bool) -> Use "Label Augmentation" strategy 
 '''
-class EpitheliumDataFeed:
+class EpitheliumDataFeed(GenericDataFeed):
 
     def __init__(self, params, db, generator=None):
-        # General parameters
-        self.directory = params['dataset_dir']
-        self.tile_size = params['tile_size']
-        self.db = db
-        self.Xdir = os.path.join(self.directory, db)
-        self.v = params['verbose'] if 'verbose' in params else False
-        
-        # SNOW parameters
-        self.annotations = params['annotations'] if 'annotations' in params else 'full' # Which version of the data to use
-        self.noisy = params['noisy'] if 'noisy' in params else False
-        self.pNoise = params['pNoise'] if 'pNoise' in params else 0.5
-        self.generative = params['generative'] if 'generative' in params else False
-        self.generator = generator
-        self.onlyPositives = params['onlyPositives'] if 'onlyPositives' in params else False
-        self.tda = params['tda'] if 'tda' in params else False
+        super().__init__(params,db,generator)
 
+        # Additional General parameters
+        self.Xdir = os.path.join(self.directory, db)
+        
         # Find all RGB images & annotation masks
         self.Ydir = os.path.join(self.directory, "labels-%s"%self.annotations)
         files = [f for f in os.listdir(self.Xdir)]
@@ -70,15 +60,12 @@ class EpitheliumDataFeed:
 
         # Prepare random sampling
         self.idxs = np.arange(len(self.files_Y))
-        self.pointer = 0
-        self.seed = params['random_seed'] if 'random_seed' in params else 56489143
-        np.random.seed(self.seed)
-
+        
         if( self.v ): print("Loading data from %s"%self.directory)
 
         # Load images
         self.images_X = [imread(f) for f in self.files_X]
-        self.images_Y = [imread(f, dtype='uint16') for f in self.files_Y]
+        self.images_Y = [imread(f).astype('uint16') for f in self.files_Y]
         if( self.tda ):
             self.images_Yplus = [imread(f) for f in self.files_Yplus]
             self.images_Yminus = [imread(f) for f in self.files_Yminus]
@@ -176,35 +163,3 @@ class EpitheliumDataFeed:
             return batch_X,batch_Y_seg,batch_Y_det
         else:
             return batch_augmentation(batch_X,batch_Y_seg,batch_Y_det)
-
-    '''
-    Batch generator
-    Yield samples from dataset
-    '''
-    def next_batch(self, batch_size, max_iterations, forValidation=False):
-        if( self.v ): print("Starting %d iterations"%(max_iterations))
-        # iterations = sampling each image at least once
-        for it in range(max_iterations):
-            # Shuffle ids so we don't always go through the images in the same order
-            np.random.shuffle(self.idxs)
-            # print("Iteration: %d"%it)
-
-            # For each slide : draw a random sample. Go through each image once before starting again with new seed
-            for idx in self.idxs:
-                yield self.get_sample(idx, batch_size,forValidation)
-
-    '''
-    Draw a validation set from the training set, using no data augmentation.
-    '''
-    def validation_set(self, batch_size):
-        images_used = 10
-        n_per_image = batch_size//images_used # 10 images in validation set
-        Xval = np.zeros((batch_size, self.tile_size, self.tile_size, 3))
-        Yval_seg = np.zeros((batch_size, self.tile_size, self.tile_size, 2))
-        Yval_det = np.zeros((batch_size, 2))
-        for i in range(images_used):
-            X,Y_seg,Y_det = self.get_sample(self.idxs[i], n_per_image, True)
-            Xval[int(i*n_per_image):int((i+1)*n_per_image),:,:,:] = X.copy()
-            Yval_seg[int(i*n_per_image):int((i+1)*n_per_image),:,:,:] = Y_seg.copy()
-            Yval_det[int(i*n_per_image):int((i+1)*n_per_image)] = Y_det.copy()
-        return Xval,Yval_seg,Yval_det
