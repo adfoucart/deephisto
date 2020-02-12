@@ -1,3 +1,5 @@
+import time
+
 '''
 Print iterations progress
 From Benjamin Cordier on https://stackoverflow.com/a/34325723
@@ -47,3 +49,37 @@ def saveAnnotationImage(rgb, mask, output_file, mode='red'):
         from skimage.io import imsave
         out = blend2Images(rgb, mask)
         imsave(output_file, out)
+
+'''
+Handle the pre-fetch for the threaded version of the network training.
+'''
+class PreFetcher(object):
+    def __init__(self, feed):
+        self.batchIsReady = False
+        self.isOver = False
+        self.batch = None
+        self.feed = feed
+        pass
+
+    def setBatch(self, batch):
+        while( self.batchIsReady ):
+            time.sleep(0.001)
+
+        self.batch = batch
+        self.batchIsReady = True
+
+    def getBatch(self):
+        while( self.batchIsReady == False ):
+            time.sleep(0.001)
+
+        self.batchIsReady = False
+        return self.batch
+
+    def validation_set(self, n):
+        return self.feed.validation_set(n)
+
+    def fetch(self, batch_size, epochs):
+        for X,Y,c in self.feed.next_batch(batch_size,epochs):
+            self.setBatch((X,Y,c))
+            
+        self.isOver = True
