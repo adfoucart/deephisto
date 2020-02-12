@@ -27,7 +27,6 @@ class GenericDataFeed:
 
         # Random sampling
         self.seed = params['random_seed'] if 'random_seed' in params else 56489143
-        np.random.seed(self.seed)
         self.pointer = 0
 
         self.files_X = []
@@ -41,6 +40,7 @@ class GenericDataFeed:
     def next_batch(self, batch_size, max_iterations, forValidation=False):
         if( self.v ): print("Starting %d iterations"%(max_iterations))
         # iterations = sampling each image at least once
+        np.random.seed(self.seed)
         for it in range(max_iterations):
             # Shuffle ids so we don't always go through the images in the same order
             np.random.shuffle(self.idxs)

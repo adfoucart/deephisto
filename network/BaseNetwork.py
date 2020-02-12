@@ -56,6 +56,8 @@ class BaseNetwork:
         self.generative = params['generative'] if 'generative' in params else False
         self.generator = params['generator'] if 'generator' in params else None
 
+        self.seed = params['random_seed'] if 'random_seed' in params else 56489143
+
     '''
     Setup the graphs & sessions
     '''
@@ -67,6 +69,7 @@ class BaseNetwork:
 
         # Restore autoencoder if needed & setup input placeholder
         with self.mainGraph.as_default():
+            tf.random.set_random_seed(self.seed)
             # Loading AutoEncoder
             if( self.autoencoder != None ):
                 saver = tf.train.import_meta_graph('%s.meta'%self.autoencoder, import_scope="ae")
