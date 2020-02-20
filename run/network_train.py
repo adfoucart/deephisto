@@ -72,6 +72,8 @@ def run_train_threaded(params):
     t1.start()
     t2.start()
 
+    return t1,t2
+
 def get_net(params):
     if params['network'].lower() == 'pan' :
         net = PAN(params)
