@@ -98,7 +98,7 @@ class ArtefactDataFeed(GenericDataFeed):
     '''
     Get a batch sample from the dataset.
     '''
-    def get_sample(self, idx, batch_size, forValidation=False):
+    def get_sample(self, idx, batch_size, forValidation=False, random_seed=None):
         batch_X = np.zeros((batch_size,self.tile_size, self.tile_size, 3))
         batch_Y_seg = np.zeros((batch_size,self.tile_size,self.tile_size,2))
         batch_Y_det = np.zeros((batch_size,2))
@@ -158,7 +158,7 @@ class ArtefactDataFeed(GenericDataFeed):
         batch_Y_det[batch_Y_det[:,0]>1,0] = 1
         batch_Y_det[:,1] = 1-batch_Y_det[:,0]
 
-        if self.db != 'train' or forValidation == True:
+        if self.db != 'train' or forValidation == True or self.augmentData == False:
             return batch_X,batch_Y_seg,batch_Y_det
         else:
-            return batch_augmentation(batch_X,batch_Y_seg,batch_Y_det)
+            return batch_augmentation(batch_X,batch_Y_seg,batch_Y_det,random_seed)

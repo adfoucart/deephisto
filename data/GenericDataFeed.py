@@ -14,6 +14,8 @@ class GenericDataFeed:
         self.tile_size = params['tile_size']
         self.db = db
         self.v = params['verbose'] if 'verbose' in params else False
+        self.augmentData = params['augmentData'] if 'augmentData' in params else True
+        self.randomSequence = params['randomSequence'] if 'randomSequence' in params else None
 
         # SNOW parameters
         self.noisy = params['noisy'] if 'noisy' in params else False
@@ -41,14 +43,17 @@ class GenericDataFeed:
         if( self.v ): print("Starting %d iterations"%(max_iterations))
         # iterations = sampling each image at least once
         np.random.seed(self.seed)
-        for it in range(max_iterations):
-            # Shuffle ids so we don't always go through the images in the same order
-            np.random.shuffle(self.idxs)
-            # print("Iteration: %d"%it)
+        # If sequence provided: load it
+        seq_idxs = None
+        if( self.randomSequence != None ):
+            seq_idxs = np.load(self.randomSequence).astype('int')
+        else:
+            seq_idxs = self.generate_random_sequence(batch_size, max_iterations)
 
-            # For each slide : draw a random sample. Go through each image once before starting again with new seed
-            for idx in self.idxs:
-                yield self.get_sample(idx, batch_size, forValidation)
+        for it in range(max_iterations):
+            idxs = seq_idxs[it]
+            for idr,idx in enumerate(idxs):
+                yield self.get_sample(idx, batch_size, forValidation, it+idr)
 
     '''
     Draw a validation set from the training set, using no data augmentation. By default, use 10% of the images in the training set to create validation set.
@@ -71,3 +76,19 @@ class GenericDataFeed:
             i += 1
             n += n_in_this_image
         return Xval,Yval_seg,Yval_det
+
+    '''
+    Generate a random sequence to make sure that we can save & replicate the full data pipeline to test reproductibility
+    '''
+    def generate_random_sequence(self, batch_size, max_iterations, saveAs=None):
+        np.random.seed(self.seed)
+        seq_idxs = np.zeros((max_iterations,len(self.idxs))).astype('int')
+        for i,it in enumerate(range(max_iterations)):
+            np.random.shuffle(self.idxs)
+            seq_idxs[i,:] = self.idxs[:]
+
+        if( saveAs != None ): 
+            np.save(saveAs, seq_idxs)
+
+        return seq_idxs
+

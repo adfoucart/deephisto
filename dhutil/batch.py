@@ -6,7 +6,10 @@ On-the-fly data augmentation on a batch
 * Random noise
 * Random illumination change
 '''
-def batch_augmentation(X,Y_seg,Y_det):
+def batch_augmentation(X,Y_seg,Y_det,seed=None):
+    if( seed != None ):
+        np.random.seed(seed)
+    
     params = np.random.random((X.shape[0], 3))
     params[:,0] = np.floor(params[:,0]*4)     # Horizontal & Vertical mirrors
     params[:,1] *= 0.1                        # Random noise max value (X'(i,j) = X(i,j) + random(i,j)*max_noise)
