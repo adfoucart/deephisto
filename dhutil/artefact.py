@@ -1,7 +1,12 @@
 from skimage.transform import downscale_local_mean, resize
 from skimage.color import rgb2hsv, rgb2gray
 from skimage.morphology import opening, closing, disk
-import openslide
+OPENSLIDE_ACTIVE = True
+try:
+    import openslide
+except ImportError:
+    OPENSLIDE_ACTIVE = False
+
 import numpy as np
 
 '''
@@ -23,6 +28,9 @@ def getBackgroundMask(rgb):
 Load a whole-slide image (ndpi, svs) & extract image @ 1.25x magnification
 '''
 def get_image(fpath, verbose=False):
+    if( OPENSLIDE_ACTIVE == False ): 
+        print("Error - Openslide could not be loaded")
+        return False
     if( verbose ): print("Loading RGB image @ 1.25x magnification")
     slide = openslide.OpenSlide(fpath)
     op = float(slide.properties['openslide.objective-power']) # maximum magnification
