@@ -2,7 +2,7 @@
 '''
 Author: Adrien Foucart
 '''
-from data import ArtefactDataFeed, EpitheliumDataFeed, WarwickDataFeed
+from data import ArtefactDataFeed, EpitheliumDataFeed, WarwickDataFeed, GlasDataFeed
 from network import PAN, ShortRes, UNet
 from dhutil.network import train
 from dhutil.tools import PreFetcher
