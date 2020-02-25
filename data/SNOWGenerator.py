@@ -39,8 +39,11 @@ def SNOWGenerator(input_dir, output_dir, pRemove, defStd, simplificationFactor, 
         if( doLabelAugmentation ):
             print("Adding label augmentation.")
 
+    nLabelsIn = 0
+    nLabelsOut = 0
+
     for f in Yfiles:
-        Y = imread(os.path.join(input_dir, f), dtype='uint16')
+        Y = imread(os.path.join(input_dir, f))
         Yout = np.zeros_like(Y)
 
         # Check if annotations are already labelled or if it's a mask:
@@ -52,12 +55,14 @@ def SNOWGenerator(input_dir, output_dir, pRemove, defStd, simplificationFactor, 
         nLabels = len(labels)
         if( verbose ): 
             print("Processing: %s"%f)
-            printProgressBar(0, nLabels)
+            if( nLabels > 0 ): printProgressBar(0, nLabels)
+
+        nLabelsIn += nLabels
         
         # SNOW generation:
 
         # Draw which objects will be removed from the image
-        toRemove = np.random.random(labels.max()+1) < pRemove
+        toRemove = np.random.random(nLabels) < pRemove
         # Draw random deformation parameters:
         if( defStd > 0 ):
             diskRadii = np.random.normal(0, defStd, labels.max()+1).astype('int')
@@ -69,17 +74,17 @@ def SNOWGenerator(input_dir, output_dir, pRemove, defStd, simplificationFactor, 
             disk5 = disk(5)
 
         # To be able to get the complete contour of all objects, we first zero-pad the label image:
-        Ypadded = np.zeros((Y.shape[0]+2, Y.shape[1]+2)).astype('uint16')
+        Ypadded = np.zeros((Y.shape[0]+2, Y.shape[1]+2)).astype('uint8')
         Ypadded[1:-1,1:-1] = Y
 
         newLabel = 0 # We will re-label from 0 the resulting annotation.
         for idl,lab in enumerate(labels):
 
-            if( toRemove[lab] ): # Ignore remove objects so they won't be added to Yout
+            if( toRemove[idl] ): # Ignore remove objects so they won't be added to Yout
                 continue
 
             # Select current object
-            Yobj = (Ypadded==lab).astype('uint16')
+            Yobj = (Ypadded==lab).astype('uint8')
 
             #  Deforming objects
             if( defStd > 0 ):
@@ -125,9 +130,13 @@ def SNOWGenerator(input_dir, output_dir, pRemove, defStd, simplificationFactor, 
 
             if( verbose ): printProgressBar(idl+1, nLabels)
 
+        nLabelsOut += Yout.max()
+
         # Save output file(s)
         imsave(os.path.join(output_dir, f), Yout)
         if( doLabelAugmentation ):
             ext = f.rsplit('.')[-1]
             imsave(os.path.join(output_dir, f.replace('.%s'%ext, '-p5.%s'%ext)), Yout_p5)
             imsave(os.path.join(output_dir, f.replace('.%s'%ext, '-m5.%s'%ext)), Yout_m5)
+
+    if( verbose ): print("In: %d -> Out: %d"%(nLabelsIn, nLabelsOut))
