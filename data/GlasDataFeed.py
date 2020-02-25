@@ -27,7 +27,7 @@ from .GenericDataFeed import GenericDataFeed
 from skimage.io import imread
 from dhutil.batch import batch_augmentation
 
-class WarwickDataFeed(GenericDataFeed):
+class GlasDataFeed(GenericDataFeed):
 
     def __init__(self, params, db, generator=None):
         super().__init__(params,db,generator)
