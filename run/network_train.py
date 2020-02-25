@@ -89,7 +89,8 @@ def get_feed(params, net):
         feed = ArtefactDataFeed(params, 'train', net.predict_generator)
     elif params['feed_name'].lower() in ['epithelium', 'epi']:
         feed = EpitheliumDataFeed(params, 'train', net.predict_generator)
-    elif params['feed_name'].lower() in ['warwick', 'glas']:
+    elif params['feed_name'].lower() in ['warwick']:
         feed = WarwickDataFeed(params, 'train', net.predict_generator)
-
+    elif params['feed_name'].lower() in ['glas']:
+        feed = GlasDataFeed(params, 'train', net.predict_generator)
     return feed
