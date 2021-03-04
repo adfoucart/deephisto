@@ -44,6 +44,17 @@ def get_image(fpath, verbose=False):
     return rgb_image
 
 '''
+Display green overlay on image where there is an artefact
+'''
+def imageWithOverlay(img, mask):
+    imask = mask==False
+    output_image = img.copy()
+    output_image[imask,:] *= np.array([0,1,0]).astype('uint8')
+
+    return output_image
+
+
+'''
 blend2Images mathod From HistoQC (Janowczyk et al, 2019)
 https://github.com/choosehappy/HistoQC
 

@@ -14,7 +14,7 @@ import tensorflow as tf
 import os
 import numpy as np
 from skimage.io import imsave
-from dhutil.artefact import getBackgroundMask, blend2Images, get_image
+from dhutil.artefact import getBackgroundMask, blend2Images, get_image, imageWithOverlay
 from dhutil.tools import printProgressBar
 from dhutil.network import restore
 import time
@@ -28,12 +28,13 @@ Process an 1.25x mag RGB image.
 * Y_seg -> the segmentation output Tensor
 * tile_size
 '''
-def process(sess, rgb, X, Y_seg, tile_size, verbose=False):
+def process(sess, rgb, X, Y_seg, tile_size, bgDetection=True, verbose=False):
     if(verbose): print("Processing RGB image")
 
     # Background detection
     if(verbose): print("Background detection.")
-    bg_mask = getBackgroundMask(rgb) # 1 = foreground, 0 = background
+    bg_mask = np.ones((rgb.shape[0],rgb.shape[1])).astype('bool')
+    if( bgDetection ): bg_mask = getBackgroundMask(rgb) # 1 = foreground, 0 = background
     
     overlap = 2
     
@@ -58,9 +59,9 @@ def process(sess, rgb, X, Y_seg, tile_size, verbose=False):
 
     mask_pred = im_pred<=0.5 # mask_pred will be 0=artefact, 1=no artefact
     mask_out = mask_pred*bg_mask # 1=normal tissue, 0 = background or artefact
-    im_out = blend2Images(rgb, mask_out)
+    im_out = imageWithOverlay(rgb,mask_out)#blend2Images(rgb, mask_out)
 
-    return im_pred,im_out, bg_mask
+    return im_pred, im_out, bg_mask
 
 '''
 Detect artefact on WSI
@@ -70,10 +71,11 @@ Detect artefact on WSI
 * network_path -> checkpoint path of the network
 * asThread -> threaded version where the method polls the input folder regularly for new files to digest
 * ext (optional) -> extension filter 
+* bgDetection (optional) -> if True, also remove background
 
 Results are stored in output_dir.
 '''
-def artefact_detector(input_dir, output_dir, network_path, asThread=False, ext=None, verbose=False):
+def artefact_detector(input_dir, output_dir, network_path, asThread=False, ext=None, bgDetection=True, verbose=False):
     if( ext == None ):
         ext = ['svs', 'ndpi']
     
@@ -119,19 +121,21 @@ def artefact_detector(input_dir, output_dir, network_path, asThread=False, ext=N
                     continue
 
             # Process
-            im_pred, im_out, bg_mask = process(sess, rgb, X, Y_seg, tile_size, verbose)
+            im_pred, im_out, bg_mask = process(sess, rgb, X, Y_seg, tile_size, bgDetection, verbose)
 
             # Compute & save quick stat
-            total_artefact_tissue = ((im_pred>0.5)*bg_mask).sum()
-            total_tissue = (bg_mask).sum()
-            with open(os.path.join(output_dir, "%s_stat.txt"%os.path.basename(input_image)), 'w') as fp:
-                fp.write("Artefact in non-background tissue: %.4f %% of pixels."%(100*(total_artefact_tissue/total_tissue)))
+            if( bgDetection ):
+                total_artefact_tissue = ((im_pred>0.5)*bg_mask).sum()
+                total_tissue = (bg_mask).sum()
+                with open(os.path.join(output_dir, "%s_stat.txt"%os.path.basename(input_image)), 'w') as fp:
+                    fp.write("Artefact in non-background tissue: %.4f %% of pixels."%(100*(total_artefact_tissue/total_tissue)))
 
             # Save results
             imsave(os.path.join(output_dir, "%s_rgb.png"%os.path.basename(input_image)), rgb)
             imsave(os.path.join(output_dir, "%s_prob.png"%os.path.basename(input_image)), im_pred)
             imsave(os.path.join(output_dir, "%s_fused.png"%os.path.basename(input_image)), im_out)
-            imsave(os.path.join(output_dir, "%s_bg.png"%os.path.basename(input_image)), bg_mask.astype('uint8')*255)
+            if( bgDetection ):
+                imsave(os.path.join(output_dir, "%s_bg.png"%os.path.basename(input_image)), bg_mask.astype('uint8')*255)
 
             # Rename file to make sure we don't redo it after
             os.rename(input_image, '%s.done'%input_image)

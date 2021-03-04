@@ -4,7 +4,7 @@ Author: Adrien Foucart
 '''
 
 import tensorflow as tf
-from network import PAN, ShortRes
+from network import PAN, ShortRes, UNet
 
 '''
 Get the number of parameters in the networks
@@ -15,13 +15,14 @@ def get_number_of_parameters():
         'clf_name': 'stats',
         'checkpoints_dir': '.',
         'summaries_dir': '.',
-        'tile_size': 256
+        'tile_size': 128
     }
 
     pan = PAN(params)
     sr = ShortRes(params)
+    un = UNet(params)
 
-    for net in [pan, sr]:
+    for net in [pan, sr, un]:
         net.create_network()
 
         with net.mainGraph.as_default():

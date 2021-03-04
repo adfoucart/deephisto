@@ -51,6 +51,66 @@ def saveAnnotationImage(rgb, mask, output_file, mode='red'):
         imsave(output_file, out)
 
 '''
+Compute F1 Score
+
+T = Ground truth segmentation (binary)
+P = Predicted segmentation (binary)
+'''
+def F1(T,P):
+    TP = ((T==1)*(P==1)).sum()
+    TN = ((T==0)*(P==0)).sum()
+    FP = ((T==0)*(P==1)).sum()
+    FN = ((T==1)*(P==0)).sum()
+
+    try:
+        return 2*TP/(2*TP+FN+FP)
+    except ZeroDivisionError:
+        return 0
+
+'''
+Compute Matthews correlation coefficient
+
+T = Ground truth segmentation (binary)
+P = Predicted segmentation (binary)
+'''
+def MCC(T,P):
+    TP = float(((T==1)*(P==1)).sum())
+    TN = float(((T==0)*(P==0)).sum())
+    FP = float(((T==0)*(P==1)).sum())
+    FN = float(((T==1)*(P==0)).sum())
+
+    try:
+        return ((TP*TN)-(FP*FN))/((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN))**(.5)
+    except ZeroDivisionError:
+        return 0
+
+'''
+Compute accuracy
+
+T = Ground truth segmentation (binary)
+P = Predicted segmentation (binary)
+'''
+def ACC(T,P):
+    return (T==P).sum()/((T==P).sum()+(T!=P).sum())
+
+'''
+Compute Jaccard Index
+
+T = Ground truth segmentation (binary)
+P = Predicted segmentation (binary)
+'''
+def JACC(T,P):
+    TP = float(((T==1)*(P==1)).sum())
+    TN = float(((T==0)*(P==0)).sum())
+    FP = float(((T==0)*(P==1)).sum())
+    FN = float(((T==1)*(P==0)).sum())
+
+    try:
+        return TP/(TP+FN+FP)
+    except ZeroDivisionError:
+        return 0
+
+'''
 Handle the pre-fetch for the threaded version of the network training.
 '''
 class PreFetcher(object):
