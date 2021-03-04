@@ -5,6 +5,7 @@ PhD Thesis code base
 
 * Artefact detection in whole-slide imaging
 * Effects of annotation imperfections on segmentation methods (SNOW)
+* Analysis of multi-expert annotations using the Gleason2019 dataset
 
 ## Publications
 
@@ -30,6 +31,8 @@ https://doi.org/doi:10.3389/fmed.2019.00222
 * Openslide (for running the whole-slide artefact detector)
 * Scikit-Image
 * Numpy
+* SimpleITK (for running the Gleason code)
+* Scikit-learn (for running the Gleason code)
 
 ## Datasets
 
@@ -52,3 +55,11 @@ J. Pathol. Inform., vol. 7, no. 29, 2016.
 ### Artefact
 
 To be released. If you are interested in using this dataset, please contact me: afoucart@ulb.ac.be
+
+## Gleason2019 challenge
+
+https://gleason2019.grand-challenge.org/Register/
+
+Nir G, Hor S, Karimi D, Fazli L, Skinnider BF, Tavassoli P, Turbin D, Villamil CF, Wang G, Wilson RS, Iczkowski KA. Automatic grading of prostate cancer in digitized histopathology images: Learning from multiple experts. Medical image analysis. 2018 Dec 1;50:167-80.
+
+Karimi D, Nir G, Fazli L, Black PC, Goldenberg L, Salcudean SE. Deep Learning-Based Gleason Grading of Prostate Cancer From Histopathology Images—Role of Multiscale Decision Aggregation and Data Augmentation. IEEE journal of biomedical and health informatics. 2019 Sep 30;24(5):1413-26.
