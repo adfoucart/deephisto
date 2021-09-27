@@ -1,4 +1,5 @@
 # Deep Learning applied to Digital Pathology
+
 PhD Thesis code base
 
 ## Research topics:
@@ -7,27 +8,33 @@ PhD Thesis code base
 * Effects of annotation imperfections on segmentation methods (SNOW)
 * Analysis of multi-expert annotations using the Gleason2019 dataset
 
+Research blog: https://adfoucart.be/research 
+
 ## Publications
+
+Foucart, A., Debeir, O., & Decaestecker, C.<br />
+Snow Supervision in Digital Pathology: Managing Imperfect Annotations for Segmentation in Deep Learning<br />
+Preprint (2020) - https://www.researchsquare.com/article/rs-116512/v1
 
 Foucart, A., Debeir, O., & Decaestecker, C. <br />
 SNOW: Semi-Supervised, NOisy and/or Weak Data for Deep Learning in Digital Pathology. <br />
 In 2019 IEEE 16th International Symposium on Biomedical Imaging (ISBI 2019) (pp. 1869-1872) <br />
 https://doi.org/10.1109/ISBI.2019.8759545
 
-Foucart, A., Debeir, O., & Decaestecker, C. <br />
-Artifact Identification in Digital Pathology from Weak and Noisy Supervision with Deep Residual Networks. <br />
-The 4th International Conference on Cloud Computing Technologies and Application (CloudTech'18) (2018) <br />
-https://doi.org/doi:10.1109/CloudTech.2018.8713350
-
 Van Eycke, Y.-R., Foucart, A., & Decaestecker, C. <br />
 Strategies to Reduce the Expert Supervision Required for Deep Learning-Based Segmentation of Histopathological Images. <br />
 Frontiers in Medicine, 6, 222. (2019)<br />
 https://doi.org/doi:10.3389/fmed.2019.00222
 
+Foucart, A., Debeir, O., & Decaestecker, C. <br />
+Artifact Identification in Digital Pathology from Weak and Noisy Supervision with Deep Residual Networks. <br />
+The 4th International Conference on Cloud Computing Technologies and Application (CloudTech'18) (2018) <br />
+https://doi.org/doi:10.1109/CloudTech.2018.8713350
+
 ## Dependencies
 
-* Python 3.6
-* TensorFlow (built on version 1.14)
+* "Legacy code" require Python 3.6 / TensorFlow 1.14 (in data/ & network/)
+* More up-to-date code require Python 3.7+ / TensorFlow 2 (in generator/ & model/ + run/network_train_v2.py)
 * Openslide (for running the whole-slide artefact detector)
 * Scikit-Image
 * Numpy
@@ -45,7 +52,7 @@ https://warwick.ac.uk/fac/sci/dcs/research/tia/glascontest/download/
 K. Sirinukunwattana, J. P. W. Pluim, H. Chen, et al,  “Gland segmentation in colon histology images: The glas challenge contest,” 
 Med. Image Anal., vol. 35, pp. 489–502, 2017.
 
-### Epithelium
+### Epithelium + Nuclei
 
 http://www.andrewjanowczyk.com/deep-learning/
 
@@ -54,7 +61,7 @@ J. Pathol. Inform., vol. 7, no. 29, 2016.
 
 ### Artefact
 
-To be released. If you are interested in using this dataset, please contact me: afoucart@ulb.ac.be
+To be released. If you are interested in using this dataset, please contact me: Adrien.Foucart@ulb.be
 
 ## Gleason2019 challenge
 
