@@ -8,7 +8,7 @@ PhD Thesis code base
 * Effects of annotation imperfections on segmentation methods (SNOW)
 * Analysis of multi-expert annotations using the Gleason2019 dataset
 
-Research blog: https://adfoucart.be/research 
+Research blog: https://research.adfoucart.be 
 
 ## Publications
 
