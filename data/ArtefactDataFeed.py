@@ -82,7 +82,7 @@ class ArtefactDataFeed(GenericDataFeed):
 
         if( self.v ): print("Loaded.")
 
-        # Loading nuclei positions if necessary
+        # Loading positive regions if necessary
         if( self.onlyPositives ):
             to_remove = []
             from skimage.measure import label,regionprops

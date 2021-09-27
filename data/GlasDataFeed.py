@@ -74,6 +74,7 @@ class GlasDataFeed(GenericDataFeed):
     Get a batch sample from the dataset.
     '''
     def get_sample(self, idx, batch_size, forValidation=False, random_seed=None):
+        print(self.files_X[idx])
         batch_X = np.zeros((batch_size,self.tile_size, self.tile_size, 3))
         batch_Y_seg = np.zeros((batch_size,self.tile_size,self.tile_size,2))
         batch_Y_det = np.zeros((batch_size,2))

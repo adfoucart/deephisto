@@ -53,6 +53,8 @@ class GenericDataFeed:
         for it in range(max_iterations):
             idxs = seq_idxs[it]
             for idr,idx in enumerate(idxs):
+                # batch_x,batch_y,_ = self.get_sample(idx, batch_size, forValidation, it+idr)
+                # yield batch_x,batch_y[:,:,:,0]
                 yield self.get_sample(idx, batch_size, forValidation, it+idr)
 
     '''
