@@ -2,7 +2,7 @@
 '''
 Author: Adrien Foucart
 '''
-from data import ArtefactDataFeed, EpitheliumDataFeed, WarwickDataFeed, GlasDataFeed
+from data import ArtefactDataFeed, EpitheliumDataFeed, WarwickDataFeed, GlasDataFeed, NucleiDataFeed
 from network import PAN, ShortRes, UNet
 from dhutil.network import train
 from dhutil.tools import PreFetcher
@@ -93,4 +93,6 @@ def get_feed(params, net):
         feed = WarwickDataFeed(params, 'train', net.predict_generator)
     elif params['feed_name'].lower() in ['glas']:
         feed = GlasDataFeed(params, 'train', net.predict_generator)
+    elif params['feed_name'].lower() in ['nuclei']:
+        feed = NucleiDataFeed(params, 'train', net.predict_generator)
     return feed

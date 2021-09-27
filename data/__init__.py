@@ -4,3 +4,4 @@ from .EpitheliumDataFeed import EpitheliumDataFeed
 from .WarwickDataFeed import WarwickDataFeed
 from .GlasDataFeed import GlasDataFeed
 from .SNOWGenerator import SNOWGenerator
+from .NucleiDataFeed import NucleiDataFeed
