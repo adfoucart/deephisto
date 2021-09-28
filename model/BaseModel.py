@@ -75,6 +75,10 @@ class BaseModel:
         """Save model plot to model.png file"""
         tf.keras.utils.plot_model(self.model, show_shapes=True)
 
+    def summary(self):
+        """Print model summary"""
+        self.model.summary()
+
     def save(self, fname=None):
         """Save to hdf5. By default, save tu checkpoint directory with model name as file name."""
         if fname is None:

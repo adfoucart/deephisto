@@ -13,8 +13,6 @@ class GlasGenerator(DataGenerator):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-
-
         if( self.image_strategy not in ['tile', 'full'] ):
             raise ValueError('image_strategy must be "tile" or "full"')
 

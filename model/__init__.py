@@ -4,3 +4,4 @@ from .BaseModel import BaseModel
 from .ShortResidualModel import ShortResidualModel
 from .PANModel import PANModel
 from .UNetModel import UNetModel
+from .ModelFactory import ModelFactory
