@@ -7,10 +7,16 @@ PhD Thesis code base
 * Artefact detection in whole-slide imaging
 * Effects of annotation imperfections on segmentation methods (SNOW)
 * Analysis of multi-expert annotations using the Gleason2019 dataset
+* Analysis of digital pathology challenge evaluation metrics
 
 Research blog: https://adfoucart.be/research 
 
 ## Publications
+
+Foucart, A., Debeir, O., & Decaestecker, C.<br />
+Processing multi-expert annotations in digital pathology: a study of the Gleason2019 challenge.<br />
+17th International Symposium on Medical Information Processing and Analysis (SIPAIM 2021)<br />
+Accepted to the conference, awaiting publication.
 
 Foucart, A., Debeir, O., & Decaestecker, C.<br />
 Snow Supervision in Digital Pathology: Managing Imperfect Annotations for Segmentation in Deep Learning<br />
@@ -33,7 +39,7 @@ https://doi.org/doi:10.1109/CloudTech.2018.8713350
 
 ## Dependencies
 
-* "Legacy code" require Python 3.6 / TensorFlow 1.14 (in data/ & network/)
+* "Legacy code" require Python 3.6 / TensorFlow 1.14 (mostly in data/ & network/)
 * More up-to-date code require Python 3.7+ / TensorFlow 2 (in generator/ & model/ + run/network_train_v2.py)
 * Openslide (for running the whole-slide artefact detector)
 * Scikit-Image
@@ -61,7 +67,7 @@ J. Pathol. Inform., vol. 7, no. 29, 2016.
 
 ### Artefact
 
-To be released. If you are interested in using this dataset, please contact me: Adrien.Foucart@ulb.be
+Foucart, Adrien (2020). "Artefact segmentation in digital pathology whole-slide images [Data set]." https://doi.org/10.5281/zenodo.3773096
 
 ## Gleason2019 challenge
 
