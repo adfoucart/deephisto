@@ -9,7 +9,7 @@ PhD Thesis code base
 * Analysis of multi-expert annotations using the Gleason2019 dataset
 * Analysis of digital pathology challenge evaluation metrics
 
-Research blog: https://adfoucart.be/research 
+Research blog: https://research.adfoucart.be 
 
 ## Publications
 
