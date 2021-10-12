@@ -1,0 +1,7 @@
+{
+  "batch_size" : 10,
+  "image_channels": 3,
+  "anno_channels": 2,
+  "batch_strategy": "FULL_IMAGES",
+  "epochs": 5
+}
