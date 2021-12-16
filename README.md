@@ -16,7 +16,7 @@ Research blog: https://research.adfoucart.be
 Foucart, A., Debeir, O., & Decaestecker, C.<br />
 Processing multi-expert annotations in digital pathology: a study of the Gleason2019 challenge.<br />
 17th International Symposium on Medical Information Processing and Analysis (SIPAIM 2021)<br />
-Accepted to the conference, awaiting publication.
+https://doi.org/10.1117/12.2604307
 
 Foucart, A., Debeir, O., & Decaestecker, C.<br />
 Snow Supervision in Digital Pathology: Managing Imperfect Annotations for Segmentation in Deep Learning<br />
