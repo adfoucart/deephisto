@@ -30,12 +30,12 @@ https://doi.org/10.1109/ISBI.2019.8759545
 Van Eycke, Y.-R., Foucart, A., & Decaestecker, C. <br />
 Strategies to Reduce the Expert Supervision Required for Deep Learning-Based Segmentation of Histopathological Images. <br />
 Frontiers in Medicine, 6, 222. (2019)<br />
-https://doi.org/doi:10.3389/fmed.2019.00222
+https://doi.org/10.3389/fmed.2019.00222
 
 Foucart, A., Debeir, O., & Decaestecker, C. <br />
 Artifact Identification in Digital Pathology from Weak and Noisy Supervision with Deep Residual Networks. <br />
 The 4th International Conference on Cloud Computing Technologies and Application (CloudTech'18) (2018) <br />
-https://doi.org/doi:10.1109/CloudTech.2018.8713350
+https://doi.org/10.1109/CloudTech.2018.8713350
 
 ## Dependencies
 
